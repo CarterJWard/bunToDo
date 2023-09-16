@@ -8,14 +8,14 @@ const app = new Elysia()
     html(
       <BaseHTML>
         <body>
-          <button hx-post="/clicked" hx-swap="outerHTML">
-            click me
-          </button>
+          <h1 id="parent">wow</h1>
+          <Todolist todos={db} />
+          <CreateButton />
         </body>
       </BaseHTML>
     )
   )
-  .post("/clicked", () => <div>I'm from the server</div>)
+  .post("/addTodo", () => "button clicked")
   .listen(3000);
 console.log(
   `server running at http://${app.server?.hostname}:${app.server?.port}`
@@ -32,3 +32,45 @@ const BaseHTML = ({ children }: elements.Children) => `
 </head>
 ${children}
 `;
+
+type Todo = {
+  id: number;
+  name: string;
+  completed: boolean;
+};
+
+const db: Todo[] = [
+  { id: 1, name: "learn vim", completed: false },
+  { id: 2, name: "create this app", completed: true },
+];
+
+function TodoItem({ id, completed, name }: Todo) {
+  return (
+    <div>
+      <p>{name}</p>
+    </div>
+  );
+}
+
+function Todolist({ todos }: { todos: Todo[] }) {
+  return (
+    <div>
+      {todos.map((todo) => (
+        <TodoItem {...todo} />
+      ))}
+    </div>
+  );
+}
+
+function CreateButton() {
+  return (
+    <button
+      hx-post="/addTodo"
+      hx-trigger="click"
+      hx-target="#parent"
+      hx-swap="innerHTML"
+    >
+      new task
+    </button>
+  );
+}
