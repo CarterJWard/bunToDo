@@ -1,6 +1,11 @@
-import { Elysia } from "elysia";
 import { html } from "@elysiajs/html";
+import { db } from "./db";
+import { Todo, todos } from "./db/schema";
+import { Elysia } from "elysia";
 import * as elements from "typed-html";
+
+const data = await db.select().from(todos).all();
+console.log(data);
 
 const app = new Elysia()
   .use(html())
@@ -9,13 +14,14 @@ const app = new Elysia()
       <BaseHTML>
         <body>
           <h1 id="parent">wow</h1>
-          <Todolist todos={db} />
           <CreateButton />
         </body>
       </BaseHTML>
     )
   )
-  .post("/addTodo", () => "button clicked")
+  .post("/addTodo", async () => {
+    await db.insert(todos).values({ name: "my todo" });
+  })
   .listen(3000);
 console.log(
   `server running at http://${app.server?.hostname}:${app.server?.port}`
@@ -32,17 +38,6 @@ const BaseHTML = ({ children }: elements.Children) => `
 </head>
 ${children}
 `;
-
-type Todo = {
-  id: number;
-  name: string;
-  completed: boolean;
-};
-
-const db: Todo[] = [
-  { id: 1, name: "learn vim", completed: false },
-  { id: 2, name: "create this app", completed: true },
-];
 
 function TodoItem({ id, completed, name }: Todo) {
   return (
