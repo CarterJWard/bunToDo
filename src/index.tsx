@@ -3,9 +3,7 @@ import { db } from "./db";
 import { Todo, todos } from "./db/schema";
 import { Elysia } from "elysia";
 import * as elements from "typed-html";
-
-const data = await db.select().from(todos).all();
-console.log(data);
+import { eq } from "drizzle-orm";
 
 const app = new Elysia()
   .use(html())
@@ -15,10 +13,21 @@ const app = new Elysia()
         <body>
           <h1 id="parent">wow</h1>
           <CreateButton />
+          <div hx-trigger="load" hx-get="/todos"></div>
         </body>
       </BaseHTML>
     )
   )
+  .get("/todos", async () => {
+    const items = await db.select().from(todos).all();
+    return <Todolist todos={items} />;
+  })
+  .post("/todos/complete/:id", async ({ params: { id } }) => [
+    await db
+      .update(todos)
+      .set({ completed: true })
+      .where(eq(todos.id, parseInt(id))),
+  ])
   .post("/addTodo", async () => {
     await db.insert(todos).values({ name: "my todo" });
   })
@@ -43,6 +52,13 @@ function TodoItem({ id, completed, name }: Todo) {
   return (
     <div>
       <p>{name}</p>
+      <p>{id}</p>
+      <p>{completed}</p>
+      <input
+        type="checkbox"
+        checked={completed}
+        hx-post={`/todos/complete/${id}`}
+      ></input>
     </div>
   );
 }
@@ -50,6 +66,7 @@ function TodoItem({ id, completed, name }: Todo) {
 function Todolist({ todos }: { todos: Todo[] }) {
   return (
     <div>
+      <h2>Todo's</h2>
       {todos.map((todo) => (
         <TodoItem {...todo} />
       ))}
