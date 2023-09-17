@@ -4,11 +4,10 @@ import TodoItem from "./TodoItem";
 
 export default function Todolist({ todos }: { todos: Todo[] }) {
   return (
-    <div>
-      <h2>Todo's</h2>
+    <table>
       {todos.map((todo) => (
         <TodoItem {...todo} />
       ))}
-    </div>
+    </table>
   );
 }

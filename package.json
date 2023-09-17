@@ -9,7 +9,8 @@
   },
   "scripts": {
     "dev": "bun --hot run src/index.tsx",
-    "dbPush": "bunx drizzle-kit push:sqlite"
+    "dbPush": "bunx drizzle-kit push:sqlite",
+    "build": "bun build ./src/index.tsx --outdir ./build"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
