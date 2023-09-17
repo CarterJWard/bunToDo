@@ -1,4 +1,5 @@
 import * as elements from "typed-html";
+import AddTask from "./components/AddTask";
 
 export default function App() {
   return (
@@ -6,6 +7,7 @@ export default function App() {
       <body>
         <h1>Projectly</h1>
         <div hx-trigger="load" hx-get="todos" hx-swap="outerHTML" />
+        <AddTask />
       </body>
     </BaseHTML>
   );

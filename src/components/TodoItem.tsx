@@ -13,6 +13,15 @@ export default function TodoItem({ id, completed, name }: Todo) {
           hx-post={`/todos/complete/${id}`}
         ></input>
       </td>
+      <td>
+        <button
+          hx-delete={`todos/${id}`}
+          hx-target="closest tr"
+          hx-swap="delete"
+        >
+          Delete task
+        </button>
+      </td>
     </tr>
   );
 }

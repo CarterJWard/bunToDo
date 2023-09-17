@@ -6,6 +6,7 @@ import App from "./app";
 import Todolist from "./components/TodoList";
 import { db } from "./db";
 import { todos } from "./db/schema";
+import TodoItem from "./components/TodoItem";
 
 const app = new Elysia()
   .use(html())
@@ -26,8 +27,16 @@ const app = new Elysia()
       .set({ completed: !currentStatus[0].status })
       .where(eq(todos.id, parseInt(id)));
   })
-  .post("/addTodo", async () => {
-    await db.insert(todos).values({ name: "my todo" });
+  .post("/addtodo", async ({ body }) => {
+    const newItem = await db
+      .insert(todos)
+      .values({ name: body.title })
+      .returning();
+    return <TodoItem {...newItem[0]} />;
+  })
+  .delete("todos/:id", async ({ params: { id } }) => {
+    await db.delete(todos).where(eq(todos.id, parseInt(id)));
+    return;
   })
   .listen(3000);
 console.log(
