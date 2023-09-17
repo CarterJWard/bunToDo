@@ -30,13 +30,19 @@ const app = new Elysia()
   .post("/addtodo", async ({ body }) => {
     const newItem = await db
       .insert(todos)
-      .values({ name: body.title })
+      .values({ name: body.title, due: new Date().toString() })
       .returning();
     return <TodoItem {...newItem[0]} />;
   })
   .delete("todos/:id", async ({ params: { id } }) => {
     await db.delete(todos).where(eq(todos.id, parseInt(id)));
     return;
+  })
+  .post("todos/date/:id", async ({ params: { id }, body: body }) => {
+    await db
+      .update(todos)
+      .set({ due: body.date })
+      .where(eq(todos.id, parseInt(id)));
   })
   .listen(3000);
 console.log(
